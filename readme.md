@@ -18,7 +18,8 @@ function deleteFile(path: string): boolean;
 Your task is to use this API to write a function that creates backups for a file.
 The backup should have the same name as the original file, but with a numeric suffix.
 Eg. backing up the file `foo.txt` should create `foo.txt.1`.
-However, if `foo.txt.1` already exists, it should create `foo.txt.2`, and so on.
+However, if `foo.txt.1` already exists, it should be moved to `foo.txt.2`.
+If `foo.txt.2` exists it should also renamed to `foo.txt.3`, and so on.
 
 The function should take the name of the file to backup as an argument, and return `true` if the backup was successful, `false` otherwise.
 

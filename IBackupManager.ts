@@ -7,3 +7,9 @@ export interface IBackupManager {
 export interface IBackupManagerStatic {
 	new (api: IFileApi): IBackupManager;
 }
+
+export abstract class BaseBackupManager implements IBackupManager {
+	constructor(private readonly api: IFileApi) {}
+
+	abstract backup(path: string): boolean;
+}

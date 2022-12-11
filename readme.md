@@ -27,9 +27,9 @@ Start by editing `yourCode.ts` and writing your function in the space provided.
 
 You can test your code by running `yarn test` from the command line.
 
-## Problem 2
+<!-- ## Problem 2
 
-Extend the function you wrote in problem 1 to take an optional argument that specifies the maximum number of backups to keep.
+Extend the function you wrote in problem 1 to take an optional argument that specifies the maximum number of backups to keep. -->
 
 ## Assessment Criteria (as suggested by copilot)
 

@@ -147,6 +147,9 @@ function testBackupFileThatDoesNotExist(
 	console.log(`Creating backup of ${filename}`);
 	const result = backupManager.backup(filename);
 
+	console.log('After backup');
+	fileApi.printFiles();
+
 	//Check
 	expect(result, false, 'Backup method returned true.');
 

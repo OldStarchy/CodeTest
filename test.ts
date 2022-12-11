@@ -1,3 +1,4 @@
+import clc from 'cli-color';
 import { RealFileApi } from './RealFileApi';
 import { TestFileApi } from './TestFileApi';
 import { BackupManager } from './yourCode';
@@ -116,6 +117,9 @@ function testBackupWithExistingBackup(
 	console.log(`Creating backup of ${filename}`);
 	const result = backupManager.backup(filename);
 
+	console.log('After backup');
+	fileApi.printFiles();
+
 	//Check
 	expectFileWithContent(fileApi, filename, originalContent);
 	expectFileWithContent(fileApi, firstBackupFilename, originalContent);
@@ -169,16 +173,17 @@ const tests = [
 function runTests(BackupManagerClass: typeof BackupManager) {
 	let errors = false;
 	tests.forEach((test) => {
-		console.log(`Running test ${test.name}...`);
-		console.log();
+		console.log(`Running test ${clc.blue(test.name)}...`);
 
 		try {
 			test(BackupManagerClass);
-			console.log(`Test ${test.name} passed.`);
+			console.log(`${clc.green('✔')} Test ${test.name} passed.`);
 		} catch (e: unknown) {
 			errors = true;
 			const message = e instanceof Error ? e.message : `${e}`;
-			console.error(`Test ${test.name} failed: ${message}`);
+			console.log(
+				`${clc.red('❌')} Test ${test.name} failed: ${message}`
+			);
 		}
 		console.log();
 	});

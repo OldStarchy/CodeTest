@@ -1,3 +1,4 @@
+import clc from 'cli-color';
 import { IFileApi } from './IFileApi';
 
 export class TestFileApi implements IFileApi {
@@ -46,7 +47,11 @@ export class TestFileApi implements IFileApi {
 
 	printFiles() {
 		for (const file in this.files) {
-			console.log(`${file}\n\t${this.files[file]}`);
+			console.log(
+				`${clc.yellow(file)}\n  ${clc.blackBright(
+					this.files[file].split('\r').join('\r  ')
+				)}`
+			);
 		}
 	}
 }

@@ -1,8 +1,6 @@
-import { IFileApi } from './IFileApi';
+import { IBackupManager } from './BaseBackupManager';
 
-export class BackupManager {
-	constructor(private readonly api: IFileApi) {}
-
+export class BackupManager implements IBackupManager {
 	backup(path: string): boolean {
 		// your code here
 		throw new Error('Not implemented');

@@ -1,5 +1,5 @@
 import clc from 'cli-color';
-import { IBackupManagerStatic } from './BaseBackupManager';
+import { IBackupManagerStatic } from './IBackupManager';
 import { RealFileApi } from './RealFileApi';
 import { TestFileApi } from './TestFileApi';
 import { BackupManager } from './yourCode';
@@ -24,7 +24,7 @@ class TestBase {
 		console.log(clc.blue(this.name));
 		try {
 			this.test(BackupManagerClass);
-			console.log(clc.green(`Test ${this.name} passed.`));
+			console.log(clc.green(`✔ Test ${this.name} passed.`));
 			return true;
 		} catch (e: unknown) {
 			const message = e instanceof Error ? e.message : `${e}`;
@@ -262,11 +262,14 @@ function runTests(BackupManagerClass: IBackupManagerStatic) {
 		ok = test.run(BackupManagerClass) && ok;
 		console.log();
 	});
-	return !ok;
+	return ok;
 }
 
 const ok = runTests(BackupManager);
 
 if (!ok) {
+	console.log('tests failed');
 	process.exit(1);
+} else {
+	console.log('tests passed');
 }

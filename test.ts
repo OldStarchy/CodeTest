@@ -213,6 +213,49 @@ tests.push(
 	)
 );
 
+tests.push(
+	new TestBase(
+		'Test more than 9 backups',
+
+		function (BackupManagerClass: IBackupManagerStatic) {
+			const fileApi = new TestFileApi();
+			const backupManager = new BackupManagerClass(fileApi);
+
+			//Setup
+			const filename = 'foo.txt';
+			const expectedFiles = [filename];
+
+			fileApi.createFile(filename, createRandomString());
+
+			for (let i = 1; i <= 9; i++) {
+				const backupFilename = `${filename}.${i}`;
+				expectedFiles.push(backupFilename);
+				fileApi.createFile(backupFilename, createRandomString());
+			}
+
+			console.log('Starting test with files');
+			fileApi.printFiles();
+			console.log();
+
+			//Test
+			console.log(`Creating backup of ${filename}`);
+			const result = backupManager.backup(filename);
+
+			console.log('After backup');
+			fileApi.printFiles();
+
+			//Check
+			this.expect(result, true, 'Backup method returned false.');
+
+			this.expectSetEqual(
+				new Set(Object.keys(fileApi.getFiles())),
+				new Set([...expectedFiles, 'foo.txt.10']),
+				'Unexpected files after backup.'
+			);
+		}
+	)
+);
+
 function runTests(BackupManagerClass: IBackupManagerStatic) {
 	let ok = true;
 	tests.forEach((test) => {

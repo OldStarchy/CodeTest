@@ -47,7 +47,7 @@ function expectSetEqual(
 		);
 	}
 
-	for (const item of actual) {
+	for (const item of Array.from(actual)) {
 		if (!expected.has(item)) {
 			throw new Error(
 				message || `Expected set to contain ${item}, but it does not.`

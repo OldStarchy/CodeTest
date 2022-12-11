@@ -164,6 +164,7 @@ const tests = [
 ];
 
 function runTests(BackupManagerClass: typeof BackupManager) {
+	let errors = false;
 	tests.forEach((test) => {
 		console.log(`Running test ${test.name}...`);
 		console.log();
@@ -172,11 +173,17 @@ function runTests(BackupManagerClass: typeof BackupManager) {
 			test(BackupManagerClass);
 			console.log(`Test ${test.name} passed.`);
 		} catch (e: unknown) {
+			errors = true;
 			const message = e instanceof Error ? e.message : `${e}`;
 			console.error(`Test ${test.name} failed: ${message}`);
 		}
 		console.log();
 	});
+	return !errors;
 }
 
-runTests(BackupManager);
+const ok = runTests(BackupManager);
+
+if (!ok) {
+	process.exit(1);
+}

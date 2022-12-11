@@ -1,5 +1,9 @@
 # impromptu coding challenge
 
+## Setup
+
+Download or clone this repository and run `yarn install` to install the dependencies.
+
 ## Problem 1
 
 Included in this assignment is a file named `fileApi.ts. It contains the following functions:
@@ -18,16 +22,20 @@ However, if `foo.txt.1` already exists, it should create `foo.txt.2`, and so on.
 
 The function should take the name of the file to backup as an argument, and return `true` if the backup was successful, `false` otherwise.
 
+Start by editing `yourCode.ts` and writing your function in the space provided.
+
+You can test your code by running `yarn test` from the command line.
+
 ## Problem 2
 
 Extend the function you wrote in problem 1 to take an optional argument that specifies the maximum number of backups to keep.
 
 ## Assessment Criteria (as suggested by copilot)
 
-- Correctness
-- Readability
-- Maintainability
-- Efficiency
-- Testability
-- Documentation
-- Code style
+-   Correctness
+-   Readability
+-   Maintainability
+-   Efficiency
+-   Testability
+-   Documentation
+-   Code style

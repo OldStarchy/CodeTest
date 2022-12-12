@@ -118,17 +118,25 @@ tests.push(
 	new TestBase('Backup with no complications', function (
 		BackupManagerClass: IBackupManagerStatic
 	) {
-		const fileApi = new TestFileApi();
-		const backupManager = new BackupManagerClass(fileApi);
-
 		//Setup
 		const filename = 'foo.txt';
 		const originalContent = createRandomString();
 
-		fileApi.createFile(filename, originalContent);
+		const backupFilename = `${filename}.1`;
+
+		const files = TestFileApi.from({
+			[filename]: originalContent,
+		});
+
+		const expectedFiles = TestFileApi.from({
+			[filename]: originalContent,
+			[backupFilename]: originalContent,
+		});
+
+		const backupManager = new BackupManagerClass(files);
 
 		console.log('Starting test with files');
-		fileApi.printFiles();
+		files.printFiles();
 		console.log();
 
 		//Test
@@ -136,19 +144,12 @@ tests.push(
 		const result = backupManager.backup(filename);
 
 		console.log('After backup');
-		fileApi.printFiles();
+		files.printFiles();
 
 		//Check
-		const backupFileName = `${filename}.1`;
-		this.expectFileWithContent(fileApi, backupFileName, originalContent);
-
 		this.expect(result, true, 'Backup method returned false.');
 
-		this.expectSetEqual(
-			new Set(Object.keys(fileApi.getFiles())),
-			new Set([filename, backupFileName]),
-			'Unexpected files after backup.'
-		);
+		this.expectObjectEqual(files.getFiles(), expectedFiles.getFiles());
 	})
 );
 
@@ -156,21 +157,26 @@ tests.push(
 	new TestBase('Backup with existing backup', function (
 		BackupManagerClass: IBackupManagerStatic
 	) {
-		const fileApi = new TestFileApi();
-		const backupManager = new BackupManagerClass(fileApi);
-
-		//Setup
 		const filename = 'foo.txt';
 		const firstBackupFilename = `${filename}.1`;
 		const secondBackupFilename = `${filename}.2`;
 		const originalContent = createRandomString();
 		const backupContent = createRandomString();
 
-		fileApi.createFile(filename, originalContent);
-		fileApi.createFile(firstBackupFilename, backupContent);
+		//Setup
+		const files = TestFileApi.from({
+			[filename]: originalContent,
+			[firstBackupFilename]: backupContent,
+		});
+		const expectedFiles = TestFileApi.from({
+			[filename]: originalContent,
+			[firstBackupFilename]: originalContent,
+			[secondBackupFilename]: backupContent,
+		});
+		const backupManager = new BackupManagerClass(files);
 
 		console.log('Starting test with files');
-		fileApi.printFiles();
+		files.printFiles();
 		console.log();
 
 		//Test
@@ -178,28 +184,12 @@ tests.push(
 		const result = backupManager.backup(filename);
 
 		console.log('After backup');
-		fileApi.printFiles();
+		files.printFiles();
 
 		//Check
-		this.expectFileWithContent(fileApi, filename, originalContent);
-		this.expectFileWithContent(
-			fileApi,
-			firstBackupFilename,
-			originalContent
-		);
-		this.expectFileWithContent(
-			fileApi,
-			secondBackupFilename,
-			backupContent
-		);
-
 		this.expect(result, true, 'Backup method returned false.');
 
-		this.expectSetEqual(
-			new Set(Object.keys(fileApi.getFiles())),
-			new Set([filename, firstBackupFilename, secondBackupFilename]),
-			'Unexpected files after backup.'
-		);
+		this.expectObjectEqual(files.getFiles(), expectedFiles.getFiles());
 	})
 );
 
@@ -208,14 +198,19 @@ tests.push(
 		'Backup file that does not exist',
 
 		function (BackupManagerClass: IBackupManagerStatic) {
-			const fileApi = new TestFileApi();
-			const backupManager = new BackupManagerClass(fileApi);
-
 			//Setup
 			const filename = 'foo.txt';
 
+			const files = TestFileApi.from({
+				//No files
+			});
+			const expectedFiles = TestFileApi.from({
+				//No files
+			});
+			const backupManager = new BackupManagerClass(files);
+
 			console.log('Starting test with files');
-			fileApi.printFiles();
+			files.printFiles();
 			console.log();
 
 			//Test
@@ -223,16 +218,12 @@ tests.push(
 			const result = backupManager.backup(filename);
 
 			console.log('After backup');
-			fileApi.printFiles();
+			files.printFiles();
 
 			//Check
 			this.expect(result, false, 'Backup method returned true.');
 
-			this.expectSetEqual(
-				new Set(Object.keys(fileApi.getFiles())),
-				new Set([]),
-				'Unexpected files after backup.'
-			);
+			this.expectObjectEqual(files.getFiles(), expectedFiles.getFiles());
 		}
 	)
 );
@@ -242,26 +233,25 @@ tests.push(
 		'Test more than 9 backups',
 
 		function (BackupManagerClass: IBackupManagerStatic) {
-			const fileApi = new TestFileApi();
-			const expectedFiles = new TestFileApi();
-			const backupManager = new BackupManagerClass(fileApi);
-
 			//Setup
 			const filename = 'foo.txt';
+			const files = new TestFileApi();
+			const expectedFiles = new TestFileApi();
+			const backupManager = new BackupManagerClass(files);
 
 			const content = createRandomString();
-			fileApi.createFile(filename, content);
+			files.createFile(filename, content);
 			expectedFiles.createFile(filename, content);
 			expectedFiles.createFile(`${filename}.1`, content);
 
 			for (let i = 1; i <= 10; i++) {
 				const content = createRandomString();
-				fileApi.createFile(`${filename}.${i}`, content);
+				files.createFile(`${filename}.${i}`, content);
 				expectedFiles.createFile(`${filename}.${i + 1}`, content);
 			}
 
 			console.log('Starting test with files');
-			fileApi.printFiles();
+			files.printFiles();
 			console.log();
 
 			//Test
@@ -269,16 +259,12 @@ tests.push(
 			const result = backupManager.backup(filename);
 
 			console.log('After backup');
-			fileApi.printFiles();
+			files.printFiles();
 
 			//Check
 			this.expect(result, true, 'Backup method returned false.');
 
-			this.expectObjectEqual(
-				fileApi.getFiles(),
-				expectedFiles.getFiles(),
-				'Unexpected files after backup.'
-			);
+			this.expectObjectEqual(files.getFiles(), expectedFiles.getFiles());
 		}
 	)
 );

@@ -9,6 +9,12 @@ import { IFileApi } from './IFileApi';
 export class TestFileApi implements IFileApi {
 	private files: Record<string, string> = {};
 
+	static from(files: Record<string, string>): TestFileApi {
+		const fileApi = new TestFileApi();
+		fileApi.files = { ...files };
+		return fileApi;
+	}
+
 	moveFile(source: string, destination: string): boolean {
 		if (this.files[source]) {
 			this.files[destination] = this.files[source];

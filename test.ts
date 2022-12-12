@@ -269,6 +269,42 @@ tests.push(
 	)
 );
 
+tests.push(
+	new TestBase(
+		'Test backing up a file that already has a numerical suffix',
+		function (BackupManagerClass: IBackupManagerStatic) {
+			//Setup
+			const filename = 'foo.txt.1';
+			const content = createRandomString();
+			const backupFileName = `${filename}.1`;
+			const files = TestFileApi.from({
+				[filename]: content,
+			});
+			const expectedFiles = TestFileApi.from({
+				[filename]: content,
+				[backupFileName]: content,
+			});
+			const backupManager = new BackupManagerClass(files);
+
+			console.log('Starting test with files');
+			files.printFiles();
+			console.log();
+
+			//Test
+			console.log(`Creating backup of ${filename}`);
+			const result = backupManager.backup(filename);
+
+			console.log('After backup');
+			files.printFiles();
+
+			//Check
+			this.expect(result, true, 'Backup method returned false.');
+
+			this.expectObjectEqual(files.getFiles(), expectedFiles.getFiles());
+		}
+	)
+);
+
 function runTests(BackupManagerClass: IBackupManagerStatic) {
 	let ok = true;
 	tests.forEach((test) => {

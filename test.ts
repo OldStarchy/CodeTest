@@ -86,6 +86,30 @@ class TestBase {
 			}
 		}
 	}
+
+	expectObjectEqual(
+		actual: Record<string, any>,
+		expected: Record<string, any>,
+		message?: string
+	) {
+		const actualKeys = Object.keys(actual);
+		const expectedKeys = Object.keys(expected);
+
+		this.expectSetEqual(
+			new Set(actualKeys),
+			new Set(expectedKeys),
+			message
+		);
+
+		for (const key of actualKeys) {
+			this.expect(
+				actual[key],
+				expected[key],
+				message ||
+					`Expected property ${key} to be ${expected[key]}, but got ${actual[key]} instead.`
+			);
+		}
+	}
 }
 
 const tests: TestBase[] = [];
@@ -219,18 +243,21 @@ tests.push(
 
 		function (BackupManagerClass: IBackupManagerStatic) {
 			const fileApi = new TestFileApi();
+			const expectedFiles = new TestFileApi();
 			const backupManager = new BackupManagerClass(fileApi);
 
 			//Setup
 			const filename = 'foo.txt';
-			const expectedFiles = [filename];
 
-			fileApi.createFile(filename, createRandomString());
+			const content = createRandomString();
+			fileApi.createFile(filename, content);
+			expectedFiles.createFile(filename, content);
+			expectedFiles.createFile(`${filename}.1`, content);
 
-			for (let i = 1; i <= 9; i++) {
-				const backupFilename = `${filename}.${i}`;
-				expectedFiles.push(backupFilename);
-				fileApi.createFile(backupFilename, createRandomString());
+			for (let i = 1; i <= 10; i++) {
+				const content = createRandomString();
+				fileApi.createFile(`${filename}.${i}`, content);
+				expectedFiles.createFile(`${filename}.${i + 1}`, content);
 			}
 
 			console.log('Starting test with files');
@@ -247,9 +274,9 @@ tests.push(
 			//Check
 			this.expect(result, true, 'Backup method returned false.');
 
-			this.expectSetEqual(
-				new Set(Object.keys(fileApi.getFiles())),
-				new Set([...expectedFiles, 'foo.txt.10']),
+			this.expectObjectEqual(
+				fileApi.getFiles(),
+				expectedFiles.getFiles(),
 				'Unexpected files after backup.'
 			);
 		}

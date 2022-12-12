@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { IFileApi } from './IFileApi';
 
-export class RealFileApi implements IFileApi {
+export class FileApi implements IFileApi {
 	moveFile(source: string, destination: string): boolean {
 		try {
 			fs.renameSync(source, destination);

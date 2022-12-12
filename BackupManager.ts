@@ -1,4 +1,4 @@
-import { BaseBackupManager } from './IBackupManager';
+import { BaseBackupManager } from './lib/BaseBackupManager';
 
 export class BackupManager extends BaseBackupManager {
 	backup(path: string): boolean {

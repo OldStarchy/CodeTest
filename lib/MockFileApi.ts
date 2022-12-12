@@ -1,8 +1,13 @@
 import clc from 'cli-color';
 import { IFileApi } from './IFileApi';
 
+/**
+ * A mock file api that can be used for testing.
+ *
+ * Files are stored in memory and not on the disk.
+ */
 export class TestFileApi implements IFileApi {
-	private files: { [key: string]: string } = {};
+	private files: Record<string, string> = {};
 
 	moveFile(source: string, destination: string): boolean {
 		if (this.files[source]) {

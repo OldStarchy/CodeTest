@@ -1,8 +1,8 @@
 import clc from 'cli-color';
-import { IBackupManagerStatic } from './IBackupManager';
-import { RealFileApi } from './RealFileApi';
-import { TestFileApi } from './TestFileApi';
-import { BackupManager } from './yourCode';
+import { BackupManager } from './BackupManager';
+import { FileApi } from './lib/FileApi';
+import { IBackupManagerStatic } from './lib/IBackupManagerStatic';
+import { TestFileApi } from './lib/MockFileApi';
 
 function createRandomString() {
 	return (
@@ -48,7 +48,7 @@ class TestBase {
 	}
 
 	expectFileWithContent(
-		fileApi: TestFileApi | RealFileApi,
+		fileApi: TestFileApi | FileApi,
 		name: string,
 		content: string
 	) {

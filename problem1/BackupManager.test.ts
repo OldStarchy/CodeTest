@@ -2,9 +2,7 @@ import { createRandomString } from '../lib/createRandomString';
 import { TestFileApi } from '../lib/MockFileApi';
 import { BackupManager } from './BackupManager';
 
-const testBackupManager = describe.each([[BackupManager]]);
-
-testBackupManager('Backup with no complications', (BackupManagerClass) => {
+test('Backup with no complications', () => {
 	//Setup
 	const filename = 'foo.txt';
 	const originalContent = createRandomString();
@@ -20,18 +18,10 @@ testBackupManager('Backup with no complications', (BackupManagerClass) => {
 		[backupFilename]: originalContent,
 	});
 
-	const backupManager = new BackupManagerClass(files);
-
-	console.log('Starting test with files');
-	files.printFiles();
-	console.log();
+	const backupManager = new BackupManager(files);
 
 	//Test
-	console.log(`Creating backup of ${filename}`);
 	const result = backupManager.rollingBackup(filename);
-
-	console.log('After backup');
-	files.printFiles();
 
 	//Check
 	expect(result).toBe(true);
@@ -39,7 +29,7 @@ testBackupManager('Backup with no complications', (BackupManagerClass) => {
 	expect(files.getFiles()).toEqual(expectedFiles.getFiles());
 });
 
-testBackupManager('Backup with existing backup', (BackupManagerClass) => {
+test('Backup with existing backup', () => {
 	const filename = 'foo.txt';
 	const firstBackupFilename = `${filename}.1`;
 	const secondBackupFilename = `${filename}.2`;
@@ -56,18 +46,10 @@ testBackupManager('Backup with existing backup', (BackupManagerClass) => {
 		[firstBackupFilename]: originalContent,
 		[secondBackupFilename]: backupContent,
 	});
-	const backupManager = new BackupManagerClass(files);
-
-	console.log('Starting test with files');
-	files.printFiles();
-	console.log();
+	const backupManager = new BackupManager(files);
 
 	//Test
-	console.log(`Creating backup of ${filename}`);
 	const result = backupManager.rollingBackup(filename);
-
-	console.log('After backup');
-	files.printFiles();
 
 	//Check
 	expect(result).toBe(true);
@@ -75,108 +57,73 @@ testBackupManager('Backup with existing backup', (BackupManagerClass) => {
 	expect(files.getFiles()).toEqual(expectedFiles.getFiles());
 });
 
-testBackupManager(
-	'Backup file that does not exist',
+test('Backup file that does not exist', () => {
+	//Setup
+	const filename = 'foo.txt';
 
-	(BackupManagerClass) => {
-		//Setup
-		const filename = 'foo.txt';
+	const files = TestFileApi.from({
+		//No files
+	});
+	const expectedFiles = TestFileApi.from({
+		//No files
+	});
+	const backupManager = new BackupManager(files);
 
-		const files = TestFileApi.from({
-			//No files
-		});
-		const expectedFiles = TestFileApi.from({
-			//No files
-		});
-		const backupManager = new BackupManagerClass(files);
+	//Test
+	const result = backupManager.rollingBackup(filename);
 
-		console.log('Starting test with files');
-		files.printFiles();
-		console.log();
+	//Check
+	expect(result).toBe(false);
 
-		//Test
-		console.log(`Creating backup of ${filename}`);
-		const result = backupManager.rollingBackup(filename);
+	expect(files.getFiles()).toEqual(expectedFiles.getFiles());
+});
 
-		console.log('After backup');
-		files.printFiles();
+test('Test more than 9 backups', () => {
+	//Setup
+	const filename = 'foo.txt';
+	const files = new TestFileApi();
+	const expectedFiles = new TestFileApi();
+	const backupManager = new BackupManager(files);
 
-		//Check
-		expect(result).toBe(false);
+	const content = createRandomString();
+	files.createFile(filename, content);
+	expectedFiles.createFile(filename, content);
+	expectedFiles.createFile(`${filename}.1`, content);
 
-		expect(files.getFiles()).toEqual(expectedFiles.getFiles());
-	}
-);
-
-testBackupManager(
-	'Test more than 9 backups',
-
-	(BackupManagerClass) => {
-		//Setup
-		const filename = 'foo.txt';
-		const files = new TestFileApi();
-		const expectedFiles = new TestFileApi();
-		const backupManager = new BackupManagerClass(files);
-
+	for (let i = 1; i <= 10; i++) {
 		const content = createRandomString();
-		files.createFile(filename, content);
-		expectedFiles.createFile(filename, content);
-		expectedFiles.createFile(`${filename}.1`, content);
-
-		for (let i = 1; i <= 10; i++) {
-			const content = createRandomString();
-			files.createFile(`${filename}.${i}`, content);
-			expectedFiles.createFile(`${filename}.${i + 1}`, content);
-		}
-
-		console.log('Starting test with files');
-		files.printFiles();
-		console.log();
-
-		//Test
-		console.log(`Creating backup of ${filename}`);
-		const result = backupManager.rollingBackup(filename);
-
-		console.log('After backup');
-		files.printFiles();
-
-		//Check
-		expect(result).toBe(true);
-
-		expect(files.getFiles()).toEqual(expectedFiles.getFiles());
+		files.createFile(`${filename}.${i}`, content);
+		expectedFiles.createFile(`${filename}.${i + 1}`, content);
 	}
-);
 
-testBackupManager(
-	'Test backing up a file that already has a numerical suffix',
-	(BackupManagerClass) => {
-		//Setup
-		const filename = 'foo.txt.1';
-		const content = createRandomString();
-		const backupFileName = `${filename}.1`;
-		const files = TestFileApi.from({
-			[filename]: content,
-		});
-		const expectedFiles = TestFileApi.from({
-			[filename]: content,
-			[backupFileName]: content,
-		});
-		const backupManager = new BackupManagerClass(files);
+	//Test
+	const result = backupManager.rollingBackup(filename);
 
-		console.log('Starting test with files');
-		files.printFiles();
-		console.log();
+	//Check
+	expect(result).toBe(true);
 
-		//Test
-		console.log(`Creating backup of ${filename}`);
-		const result = backupManager.rollingBackup(filename);
+	expect(files.getFiles()).toEqual(expectedFiles.getFiles());
+});
 
-		console.log('After backup');
-		files.printFiles();
+test('Test backing up a file that already has a numerical suffix', () => {
+	//Setup
+	const filename = 'foo.txt.1';
+	const content = createRandomString();
+	const backupFileName = `${filename}.1`;
+	const files = TestFileApi.from({
+		[filename]: content,
+	});
+	const expectedFiles = TestFileApi.from({
+		[filename]: content,
+		[backupFileName]: content,
+	});
+	const backupManager = new BackupManager(files);
 
-		//Check
-		expect(result).toBe(true);
+	//Test
+	const result = backupManager.rollingBackup(filename);
 
-		expect(files.getFiles()).toEqual(expectedFiles.getFiles());
-	}
-);
+	//Check
+	expect(result).toBe(true);
+
+	expect(files.getFiles()).toEqual(expectedFiles.getFiles());
+});

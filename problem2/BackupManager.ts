@@ -24,7 +24,7 @@ export class BackupManager extends BaseBackupManager {
 	 * @returns True if the backup was successful, false otherwise.
 	 * @throws Error if the file does not exist or could not be read
 	 */
-	rollingBackup(path: string, maxBackups: string): boolean {
+	rollingBackup(path: string, maxBackups: number): boolean {
 		// your code here
 		throw new Error('Not implemented');
 	}
